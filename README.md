@@ -1,19 +1,32 @@
 ## Welcome to Michael Zoucha's Project Page
 
-### About
+### About:
 
 This is a collection of projects from my data science Master's program from Bellevue University.
 
 
 
+--------------------------------------------------------
+### Projects:
 
-### Projects
+#### R - 
+  Sales Forecasting using MS SQL AdventureWorks dataset
+  
 
-
-
-
-
-### Contact
+#### Python -
+  Employee Attrition Classification
+  
+  Hotel Review Classificaiton
+  
+  Data Preparation - World population statistics
+  
+  Sales Forecasting using MS SQL AdventureWorks dataset
+  
+  GUI-based weather forecasting application
+  
+  
+--------------------------------------------------------
+### Contact:
 
 Michael Zoucha
 
