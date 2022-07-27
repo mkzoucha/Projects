@@ -1,0 +1,435 @@
+---
+title: "Final Project"
+author: "Michael Zoucha"
+date: '2021-11-20'
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+#bibliography: bibliography.bib
+---
+```{r echo = FALSE, include = FALSE}
+library(report)
+library(tidyverse)
+library(lubridate)
+```
+\newpage
+# Table of Contents
+
+``I.    Setup................................................................................3  ``
+``II.   Introduction.........................................................................4  ``
+``III.  Research Questions...................................................................4  ``
+``IV.   Approach.............................................................................4  ``
+``V.    Data.................................................................................5  ``
+``VI.   Data Cleaning........................................................................7  ``
+``VII.  Exploratory Data Analysis............................................................8  ``
+``VIII. Time Series Analysis................................................................12  ``
+``IX.   Regression Modeling / Forecasting...................................................16  ``
+``X.    Limitations.........................................................................17  ``
+``XI.   Conclusions.........................................................................17  ``
+\newpage
+
+# Setup
+
+## Required Packages
+
+1.  tidyverse  
+    -  Includes:
+        -  ggplot2 for visualization
+        -  dplyr for data manipulation
+        -  tidyr for data cleaning
+        -  readr for data import
+        -  purr for functional programming
+        -  tibble for tibble management
+        -  stringr for strings
+        -  forcats for factors
+2.  lubridate
+3.  report
+
+\newpage
+# Introduction
+
+|     Inventory is the arguably the most important aspect of a sales business to manage, if you don’t have goods to sell you can’t sell them, but how much excess inventory is too much?  Excess inventory, first and foremost, reduces available cash flow for an organization (Gartenstein, 2019). Reduced cash flow can lead requiring loans to cover liabilities and pay interest on that loan, or it can eliminate the ability to take advantage of a capital-requiring opportunity. In recent times, during the uncertainty of the pandemic, reduced cash flow from excess inventory meant the difference between weathering the storm and closing for good (Lazar, 2020). Using machine learning, forecasting sales quantity amounts per item, per location can help give businesses the opportunity to ensure they have enough inventory for upcoming sales, all while reducing excess inventory and the costs associated with that excess.
+
+# Research Questions
+
+1.	Using historical sales data, can one predict the maximum inventory needed on hand for a particular item in a particular time period? (i.e., for May 2022 we will need 22 of item x, and in June of 2022 we will only need 17)
+2.	Combining the predictions of inventory needs with up-to-date manufacturing and/or delivery times, can one create a dynamically changing minimum inventory number for each item? (i.e., it’s the middle May of 2022 and we have 10 of item x left, we need to order 15 by May 22 to have the stock we need for June.)
+3.	Can one optimize the relationship between number of orders to a manufacturer (hence, shipping costs) and keeping the absolute minimum number of stock on hand? (i.e., Should we order 15 on May 22, or 5 on May 22 then 5 on June 2, etc.)
+4.	Can these predictions and optimizations be broken down to the region, district, state, or even city level? (i.e., West Coast needs 12 in May 2022, Midwest needs 5 for May 2022, etc.) (i.e., San Diego needs 5, Los Angeles needs 3, Chicago needs 2, etc.)
+5.	Can one build price modeling into the forecasting to ensure inventory is purchased at lowest possible average-per-unit price? (i.e., the price of item x is forecast to go up in July of 2022, is it more profitable to buy and hold excess inventory at a lower cost?)
+6.	Could acquiring regional warehouse capabilities help reduce excess inventory even further? (i.e., San Diego only needs 2 of item x in store, because if they really need it, more is 1 day shipping away)
+
+# Approach
+
+|       By first analyzing historical sales data, a model can be created to forecast future sales amounts per item. Using this forecast model, one can create a dynamically changing minimum level of inventory to trigger new orders instead of creating static over-estimates. This dynamic inventory level will ensure enough product is in stock for upcoming sales, without compromising and overstocking excess inventory just to be certain.
+\newpage
+# Data
+
+Data comes from the AdventureWorks2019 test database from Microsoft: [AdventureWorks2019.bak](<https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak>)
+```{r echo = FALSE, include = FALSE}
+salesorderdetail_df <- read.csv("SalesOrderDetail.csv")
+salesorderheader_df <- read.csv("SalesOrderHeader.csv")
+salesterritory_df <- read.csv("SalesTerritory.csv")
+specialoffer_df <- read.csv("SpecialOffer.csv")
+productdetails_df <- read.csv("ProductDetails.csv")
+productcategory_df <- read.csv("ProductCategory.csv")
+productsubcategory_df <- read.csv("ProductSubcategory.csv")
+```
+1.	ProductDetails
+    a.	ProductID (INT) – Unique product number identifier for database
+    b.	Name (CHAR) – Unique product description / name
+    c.	ProductNumber (CHAR) – Unique warehouse stock number
+    d.	MakeFlag (INT) (BINARY) – Indicates if the good needs assembled in house
+    e.	FinishedGoodsFlag (INT) (BINARY) – Indicates whether the product is finished in the warehouse
+    f.	Color (CHAR) – Color of the product, if applicable
+    g.	SafetyStockLevel (INT) – Desired amount of inventory per item
+    h.	ReorderPoint (INT) – Level at which inventory should be reordered
+    i.	StandardCost (FLOAT) – Average cost per item
+    j.	ListPrice (FLOAT) – Average price per item
+    k.	Size (CHAR) – Measurement of item, either character or integer
+    l.	SizeUnitMeasureCode (CHAR) – Unit of measurement used for size
+    m.	Weight (FLOAT) – Weight measurement of item
+    n.	WeightUnitMeasureCode (CHAR) – Unit of measurement used for weight
+    o.	DaysToManufacture (INT) – Days required to process order before shipment
+    p.	ProductLine (CHAR) – Subclass of products
+    q.	Class (CHAR) – Subclass of products
+    r.	Style (CHAR) – Subclass of products
+    s.	ProductSubcategoryID (INT) – Splits major categories into subcategories
+    t.	ProductModelID (INT) – Unique product model number
+    u.	SellStartDate (DATE) – Date of first sale
+    v.	SellEndDate (DATE) – Date of last sale
+    w.	DiscontinuedDate (DATE) – Date manufacturer discontinued production
+    x.	ROWGUID (CHAR) – Used by MS SQL for replication
+    y.	ModifiedDate (DATE) – Date line was modified
+
+2.	ProductCategory
+    a.	ProductCategoryID (INT) – Unique product category ID
+    b.	Name (CHAR) – Unique category name
+    c.	RowGUID – Used by MS SQL for replication
+    d.	ModifiedDate (DATE) – Date line was modified
+
+3.	ProductSubcategory
+    a.	ProductSubcategoryID – Unique product subcategory ID
+    b.	ProductCategoryID (INT) – Product category ID associated with each subcategory
+    c.	Name (CHAR) – Unique category name
+    d.	RowGUID – Used by MS SQL for replication
+    e.	ModifiedDate (DATE) – Date line was modified
+
+4.	SalesOrderDetail
+    a.	SalesOrderID (INT) – Unique identifier for each complete sale
+    b.	SalesOrderDetailID (INT) – Unique identifier for each line item sold
+    c.	CarrierTracking (CHAR) – Tracking number for order
+    d.	OrderQty (INT) – Number of each item ordered per order
+    e.	ProductID (INT) – Unique identifier for the product sold
+    f.	SpecialOffer (INT) – Discount code
+    g.	UnitPrice (FLOAT) – Total price for each item sold
+    h.	UnitPriceDiscount (FLOAT) – Discount amount, if applicable
+    i.	 LineTotal (FLOAT) – Total Price per line item (UnitPrice x OrderQty)
+    j.	RowGUID – Used by MS SQL for replication
+    k.	ModifiedDate (DATE) – Date line was modified
+
+5.	SalesOrderHeader
+    a.	SalesOrderID (INT) – Unique Sales Order ID number
+    b.	RevisionNumber (INT) – Order revision number
+    c.	OrderDate (DATE) – Date of order
+    d.	DueDate (DATE) – Date order is due
+    e.	ShipDate (DATE) – Date order was shipped
+    f.	Status (INT) – Order status code
+    g.	OnlineOrderFlag (INT) (BINARY) – Indicates if order was online or in store
+    h.	SalesOrderNumber (INT) – “SO” + SalesOrderID
+    i.	PurchaseOrderNumber (INT) – Purchase Order Number
+    j.	AccountNumber (CHAR) – Customer account number
+    k.	CustomerID (INT) – Customer ID number
+    l.	SalesPersonID (INT) – ID of salesperson
+    m.	TerritoryID (INT) – Territory ID code
+    n.	BillToAddressID (INT) – Key to store billing address
+    o.	ShipToAddressID (INT) – Key to store shipping address
+    p.	ShipMethondID (INT) – Key to store shipping method
+    q.	CreditCardID (INT) – Key to store credit card info
+    r.	CreditCardApprovalCode (INT) – Approval code for credit transaction
+    s.	CurrencyRateID (INT) – Key to store currency used in transaction
+    t.	Subtotal (FLOAT) – Order subtotal
+    u.	TaxAmt (FLOAT) – Taxes for order
+    v.	Freight (FLOAT) – Shipping cost
+    w.	TotalDue (FLOAT) – Total for order (subtotal + tax + shipping)
+    x.	Comment (CHAR) – Special order comments, if applicable
+    y.	RowGUID – Used by MS SQL for replication
+    z.	ModifiedDate (DATE) – Date line was modified
+
+6.	SpecialOffer
+    a.	SpecialOfferID (INT) – Unique offer identifier
+    b.	Description (CHAR) – Discount description
+    c.	DiscountPct (FLOAT) – Discount percentage
+    d.	Type (CHAR) – Discount type
+    e.	Category (CHAR) – Discount category
+    f.	StartDate (DATE) – Promotion start date
+    g.	EndDate (DATE) – Promotion end date
+    h.	MinQty (INT) – Minimum quantity required for discount
+    i.	MaxQty (INT) – Maximum quantity allowed to be discounted
+    j.	RowGUID – Used by MS SQL for replication
+    k.	ModifiedDate (DATE) – Date line was modified
+
+7.	SalesTerritory
+    a.	TerritoryID (INT) – Unique territory identifier
+    b.	Name (CHAR) – Territory name
+    c.	CountryRegion (CHAR) – Country code
+    d.	Group (CHAR) – Territory group
+    e.	SalesYTD (FLOAT) – Aggregate of sales YTD
+    f.	SalesLastYear (FLOAT) – Aggregate of sales last year
+    g.	CostYTD (FLOAT) – Aggregate of cost YTD
+    h.	RowGUID – Used by MS SQL for replication
+    i.	ModifiedDate (DATE) – Date line was modified
+
+# Data Cleaning
+
+1. Parse down data using select function
+```{r echo = FALSE, include = FALSE}
+salesorderdetail_df <- select(salesorderdetail_df, SalesOrderID, OrderQty, 
+                              SpecialOfferID, UnitPrice, LineTotal, ProductID)
+salesorderheader_df <- select(salesorderheader_df, TerritoryID, SalesOrderID, 
+                              OrderDate)
+salesterritory_df <- select(salesterritory_df, Name, CountryRegionCode, Group, 
+                            TerritoryID)
+specialoffer_df <- select(specialoffer_df, SpecialOfferID, Description, Type, 
+                          Category)
+productdetails_df <- select(productdetails_df, ProductID, Name, ProductNumber, 
+                           Color, StandardCost, ListPrice, ProductSubcategoryID)
+productcategory_df <- select(productcategory_df, ProductCategoryID, Name)
+productsubcategory_df <- select(productsubcategory_df, ProductSubcategoryID, 
+                                Name, ProductCategoryID)
+```
+
+2. Combine product date frames into one data frame
+    a.	Merge ProductCategory to ProductSubcategory using a left join on ProductCategoryID
+    b.	Merge ProductSubcategory to ProductDetails using a left join on ProductSubcategoryID
+    c.	Rename ‘name’ columns to give more meaning
+```{r echo = FALSE, include = FALSE}
+product_merged_df <- merge(productdetails_df, productsubcategory_df, 
+                           by = "ProductSubcategoryID", all.x = TRUE) %>%
+                     merge(., productcategory_df, 
+                           by = "ProductCategoryID", all.x = TRUE)
+
+product_merged_df <- rename(product_merged_df, Subcategory = Name.y, 
+                            Category = Name)
+```
+
+3. Combine the rest of the data frames with the newly created product_merged data frame
+    a.  Merge SalesTerritory to SalesOrderHeader using a left join on TerritoryID
+    b.	Merge SpecialOffer to SalesOrderHeader using a left join on SpecialOfferID
+    c.	Merge new SalesOrderHeader_merged data frame to SalesOrderDetail using a left join on SalesOrderID
+    d.	Merge product_merged to sales_details_merged using a left join on ProductID
+    e.	Rename columns to give more meaning
+```{r echo = FALSE, include = FALSE}
+final_merged_df <- merge(salesorderdetail_df, product_merged_df, 
+                         by = "ProductID", all.x = TRUE) %>%
+                   merge(., salesorderheader_df, 
+                         by = "SalesOrderID", all.x = TRUE) %>%
+                   merge(., specialoffer_df, 
+                         by = "SpecialOfferID", all.x = TRUE) %>%
+                   merge(., salesterritory_df, 
+                         by = "TerritoryID", all.x = TRUE)
+
+final_merged_df <- rename(final_merged_df, ProductName = Name.x, ProductCategory = Category.x, 
+                          DiscountDescription = Description, DiscountType = Type, 
+                          DiscountCategory = Category.y, TerritoryName = Name, TerritoryGroup = Group)
+```
+
+4. Remove unnecessary data frames
+```{r echo = FALSE, include = FALSE}
+remove(salesorderdetail_df, salesorderheader_df, salesterritory_df, specialoffer_df, 
+       productcategory_df, productsubcategory_df, productdetails_df)
+```
+
+5. Add calculated columns to the data frame for further analysis
+    a.	Year substring of date
+    b.	Month substring of date
+    c.	TotalProfit
+    d.	ItemProfit
+```{r echo = FALSE, include = TRUE}
+final_merged_df <- dplyr::mutate(final_merged_df, 
+                                 year = substring(OrderDate,7,10)) %>%
+                   dplyr::mutate(., month = substring(OrderDate,0,2)) %>%
+                   dplyr::mutate(., totalprofit = LineTotal - (OrderQty * StandardCost)) %>%
+                   dplyr::mutate(., itemprofit = (LineTotal - (OrderQty * StandardCost)) / OrderQty)
+
+str(final_merged_df)
+```
+\newpage
+# Exploratory Data Analysis
+
+1.  Create summary tables for visualizations
+    a. Number of Sales by Product, by Year
+    b. Number of Sales by Product, by Year and Month
+    c. Number of Sales by Product Category, by Year
+    d. Number of Sales by Product Category, by Year and Month
+    e. Number of Sales by Product Subcategory, by Year
+    f. Number of Sales by Product Subcategory, by Year and Month
+```{r echo = FALSE, include = FALSE}
+## History of number of items sold for each ProductID for each year
+products_by_year<- dplyr::group_by(final_merged_df, year, ProductID) %>% 
+  dplyr::summarize(number_sold = sum(OrderQty))
+
+## History of number of items sold for each ProductID for each year
+products_by_year_month <- dplyr::group_by(final_merged_df, year, month, ProductID) %>% 
+  dplyr::summarize(number_sold = sum(OrderQty), total_revenue = sum(LineTotal)) 
+products_by_year_month <- dplyr::mutate(products_by_year_month, date = as.Date(paste(year, "/", month, "/", 01, sep = "")))
+
+## History of number of items sold for each ProductCategory for each year - include bar graph
+product_cat_by_year <- dplyr::group_by(final_merged_df, year, ProductCategory) %>% 
+  dplyr::summarize(number_sold = sum(OrderQty))
+
+## History of number of items sold for each ProductCategory for each year
+product_cat_by_year_month <- dplyr::group_by(final_merged_df, year, month, ProductCategory) %>% 
+  dplyr::summarize(number_sold = sum(OrderQty), total_revenue = sum(LineTotal)) 
+product_cat_by_year_month <- dplyr::mutate(product_cat_by_year_month, date = as.Date(paste(year, "/", month, "/", 01, sep = "")))
+## History of number of items sold for each ProductSubCategory for each year - include bar graph
+product_subcat_by_year <- dplyr::group_by(final_merged_df, year, Subcategory, ProductCategory) %>% 
+  dplyr::summarize(number_sold = sum(OrderQty))
+
+## History of number of items sold for each ProductSubCategory for each year
+product_subcat_by_year_month <- dplyr::group_by(final_merged_df, year, month, Subcategory) %>% 
+  dplyr::summarize(number_sold = sum(OrderQty), total_revenue = sum(LineTotal)) 
+product_subcat_by_year_month <- dplyr::mutate(product_subcat_by_year_month, date = as.Date(paste(year, "/", month, "/", 01, sep = "")))
+
+
+## History of number of items sold for each ProductSubCategory for each year
+product_cat_sub_by_year_month <- dplyr::group_by(final_merged_df, year, month, ProductCategory, Subcategory) %>% 
+  dplyr::summarize(number_sold = sum(OrderQty), total_revenue = sum(LineTotal)) 
+product_cat_sub_by_year_month <- dplyr::mutate(product_cat_sub_by_year_month, date = as.Date(paste(year, "/", month, "/", 01, sep = "")))
+```
+
+2.  Visualize changes in number sold throughout time by category / subcategory  
+
+```{r echo = FALSE}
+ggplot2::theme_update(plot.title = element_text(hjust = 0.5))
+ggplot2::ggplot(filter(product_subcat_by_year, ProductCategory == "Bikes"), 
+                aes(x=year, y=number_sold, fill=Subcategory)) +
+                ggplot2::geom_bar(stat="identity", position=position_dodge()) +
+                ggplot2::ggtitle("Number of Bike Items Sold per Year by Subcategory") +
+                ggplot2::xlab("Year") +
+                ggplot2::ylab("Number Sold") +
+                facet_grid(.~ProductCategory)
+
+## Pivot (spread) table to make years columns, with number_sold as the value for each subcategory
+knitr::kable(spread(select(filter(product_subcat_by_year, ProductCategory == "Bikes"), 
+                           Subcategory, year, number_sold), key = year, value = number_sold))
+```
+\newpage
+```{r echo = FALSE}
+ggplot2::theme_update(plot.title = element_text(hjust = 0.5))
+ggplot2::ggplot(filter(product_subcat_by_year, ProductCategory == "Components"), 
+                aes(x=year, y=number_sold, fill=Subcategory)) +
+                ggplot2::geom_bar(stat="identity", position=position_dodge()) +
+                ggplot2::ggtitle("Number of Component Items Sold per Year by Subcategory") +
+                ggplot2::xlab("Year") +
+                ggplot2::ylab("Number Sold") +
+                facet_grid(.~ProductCategory)
+
+## Pivot (spread) table to make years columns, with number_sold as the value for each subcategory
+knitr::kable(spread(select(filter(product_subcat_by_year, ProductCategory == "Components"), 
+                           Subcategory, year, number_sold), key = year, value = number_sold))
+```
+\newpage
+```{r echo = FALSE}
+ggplot2::theme_update(plot.title = element_text(hjust = 0.5))
+ggplot2::ggplot(filter(product_subcat_by_year, ProductCategory == "Accessories"), 
+                aes(x=year, y=number_sold, fill=Subcategory)) +
+                ggplot2::geom_bar(stat="identity", position=position_dodge()) +
+                ggplot2::ggtitle("Number of Accessory Items Sold per Year by Subcategory") +
+                ggplot2::xlab("Year") +
+                ggplot2::ylab("Number Sold") +
+                facet_grid(.~ProductCategory)
+
+## Pivot (spread) table to make years columns, with number_sold as the value for each subcategory
+knitr::kable(spread(select(filter(product_subcat_by_year, ProductCategory == "Accessories"), 
+                           Subcategory, year, number_sold), key = year, value = number_sold))
+```
+\newpage
+```{r echo = FALSE}
+ggplot2::theme_update(plot.title = element_text(hjust = 0.5))
+ggplot2::ggplot(filter(product_subcat_by_year, ProductCategory == "Clothing"), 
+                aes(x=year, y=number_sold, fill=Subcategory)) +
+                ggplot2::geom_bar(stat="identity", position=position_dodge()) +
+                ggplot2::ggtitle("Number of Clothing Items Sold per Year by Subcategory") +
+                ggplot2::xlab("Year") +
+                ggplot2::ylab("Number Sold") +
+                facet_grid(.~ProductCategory)
+
+## Pivot (spread) table to make years columns, with number_sold as the value for each subcategory
+knitr::kable(spread(select(filter(product_subcat_by_year, ProductCategory == "Clothing"), 
+                           Subcategory, year, number_sold), key = year, value = number_sold))
+```
+\newpage
+# Time Series Analysis
+
+1.  For basic analysis, visualize the change in number of items sold over time by Category
+    a.  No Category sells significantly more quantities than the others  
+```{r echo = FALSE}
+ggplot2::theme_update(plot.title = element_text(hjust = 0.5))
+ggplot2::ggplot(product_cat_by_year_month, aes(x = date, y = number_sold, color=ProductCategory)) + geom_line() +
+                ggplot2::ggtitle("Number of Items Sold by Category") +
+                ggplot2::xlab("Date") +
+                ggplot2::ylab("Total Revenue")
+```
+\newpage
+2.  To pick a subset to test our regression models, visualize total revenue by Category
+    a.  The bikes category accounts for significantly more revenue than all other Categories combined
+    b.  Since this is such a large chunk of the business, the models will start with Bikes  
+```{r echo = FALSE}
+ggplot2::ggplot(product_cat_by_year_month, aes(x = date, y = total_revenue, color=ProductCategory)) + geom_line() +
+                ggplot2::ggtitle("Revenue of Items Sold by Category") +
+                ggplot2::xlab("Date") +
+                ggplot2::ylab("Total Revenue")
+
+```
+\newpage
+3.  Visualize the differences in the types of Bikes sold over time
+    a.  From mid-2013 on, all subcategories of Bikes are similar in the quantity sold  
+```{r echo = FALSE}
+ggplot2::theme_update(plot.title = element_text(hjust = 0.5))
+ggplot2::ggplot(filter(product_cat_sub_by_year_month, ProductCategory == "Bikes"), 
+                aes(x=date, y=number_sold, color=Subcategory)) +
+                ggplot2::geom_line() +
+                ggplot2::ggtitle("Number of Bike Items Sold by Subcategory") +
+                ggplot2::xlab("Date") +
+                ggplot2::ylab("Number Sold")
+```
+\newpage
+4.  To pick a subset of Bikes to perform regression analysis on, visualize the revenue by Bike type
+    a.  All subcategories are similar in the amount of revenue
+    b.  Road bikes have the most complete data and will be the initial test group  
+```{r echo = FALSE}
+ggplot2::ggplot(filter(product_cat_sub_by_year_month, ProductCategory == "Bikes"), 
+                aes(x=date, y=total_revenue, color=Subcategory)) +
+                ggplot2::geom_line() +
+                ggplot2::ggtitle("Revenue of Bike Items Sold by Subcategory") +
+                ggplot2::xlab("Date") +
+                ggplot2::ylab("Total Revenue")
+```
+\newpage
+
+# Regression Modeling / Forecasting
+```{r echo = FALSE, include = FALSE}
+lm_model_df <- dplyr::group_by(final_merged_df, year, month, ProductID, Subcategory) %>% 
+  dplyr::summarize(number_sold = sum(OrderQty)) %>% ungroup()
+lm_model_df <- dplyr::mutate(lm_model_df, date = as.Date(paste(year, "/", month, "/", 01, sep = "")))
+
+lm_model_df <- filter(lm_model_df, Subcategory == "Road Bikes")
+lm_model_df <- select(lm_model_df, month, year, date, ProductID, number_sold)
+
+lm_model_df <- dplyr::mutate(lm_model_df, months_from_start = (interval(ymd(as.Date("2011-05-01")), ymd(date))) %/% months(1))
+lm_model_df <- dplyr::mutate(lm_model_df, julian_date = yday(date))
+lm_model_df <- dplyr::mutate(lm_model_df, numeric_date = as.numeric(date))
+```  
+   Using ProductID, year, and month, months_from_start, julian_date, and numeric_date in a linear regression model, we can see that no date columns have no statistically significant outcome on the number of items sold. For this reason, I would suggest using a multivariate time series model, such as ARIMA or exponential smoothing. Dummy binary variables could be created for each of the product ID's to further expand the feature selection of the model. Running these forecasts every month would update the model with the best currently available information. Taking these forecasts, the SafetyStockLevel and ReorderPoint for each item can be updated dynamically based on upcoming needs.
+```{r echo = FALSE}
+lm_model <- lm(number_sold ~ ProductID + date + months_from_start + julian_date + numeric_date, data=lm_model_df)
+summary(lm_model)
+```
+\newpage
+# Limitations
+This analysis does not take into account some basic assumptions about the business and their reordering process. Bulk discounts, for example, may actually save the company money when ordering larger quantities and keeping that excess inventory in the warehouse. It also does not account for the needed optimization between number of orders, inventory cost savings, and delivery costs to factor the best frequency in which to order. To be a truly effective model, it would need to account for order frequency, as well as freight delivery times, to accurately predict how much is needed in inventory for the next 'x' months. For example, if the company gets a 20% discount for bulk orders, and the freight for those orders is terribly expensive, it may be more cost effective to ignore the forecasts and stock up on extra inventory less often. Another major assumption made is that items being sold will continue being sold for a decent amount of time. Items that are planned to only be in stock for a short duration will not benefit from forecasting models because of the lack of historical data. 
+
+# Conclusion
+The time series analysis makes it evident the company could benefit from the cost-reductions that a dynamically forecast inventory program could provide. From limiting expansion opportunities to decreasing marketing budgets, excess inventory can make or break a business if not kept in check, small- to medium-businesses especially. From the beginning analysis, a large number of columns had little to no statistically significant effect on the variable(s) in question, and ultimately, to predict for the future. Another thing that was overestimated was the sheer volume of different products, some of which were no longer being sold and some of which had just recently began being sold, which is why analysis was broken down to the most profitable subcategory of the most profitable category. 
