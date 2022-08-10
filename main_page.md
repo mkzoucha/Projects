@@ -1,3 +1,3 @@
 layout: page
 title: "MAIN"
-permalink: /MAIN/
+permalink: [/MAIN/](https://mkzoucha.github.io/MAIN)
