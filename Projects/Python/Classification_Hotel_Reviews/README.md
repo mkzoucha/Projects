@@ -7,34 +7,34 @@ Description: EDA and modeling for hotel review classification
 
 File Dependencies:
 
-  Datafiniti_Hotel_Reviews.csv
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Datafiniti_Hotel_Reviews.csv
 
-  Datafiniti_Hotel_Reviews_Jun19.csv
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Datafiniti_Hotel_Reviews_Jun19.csv
 
-  tripadvisor_hotel_reviews.csv
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tripadvisor_hotel_reviews.csv
 
 
 Required Packages:
 
-  pandas - For data frame processing of location list
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pandas - For data frame processing of location list
 
-  numpy - vectorized math operations
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;numpy - vectorized math operations
 
-  wordcloud - to create word clouds
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wordcloud - to create word clouds
 
-  folium - to create geo heat maps
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;folium - to create geo heat maps
 
-  re - for text processing
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;re - for text processing
 
-  nltk - for natural language processing
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nltk - for natural language processing
 
-  sklearn - for model building
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sklearn - for model building
 
-  scipy - vectorized math operations
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scipy - vectorized math operations
 
-  keras - model building
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keras - model building
 
-  tensorflow.keras - model building
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tensorflow.keras - model building
 
-  matplotlib - visualization
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;matplotlib - visualization
 
