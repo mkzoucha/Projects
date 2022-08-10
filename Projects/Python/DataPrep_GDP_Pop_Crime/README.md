@@ -7,22 +7,32 @@ Description: A data preparation project using GDP, murder rate, and population d
 
 File Dependencies: 
 
-world_gdp_historical.csv
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;world_gdp_historical.csv
 
 
 Required Packages:
 
-Pandas - For data frame processing of location list
-Numpy - For advanced mathematical and statistical analysis
-Re - For string regex
-google.cloud - For querying BigQuery data
-google.oauth2 - For setting up BigQuery credentials
-fuzzywuzzy - For fuzzy matching
-sqlite3 - To store final data sets in SQL 
-matplotlib - For creating graphs
-seaborn - For creating graphs
-ipywidgets - For interactive graphs
-os - For file handling
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pandas - For data frame processing of location list
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Numpy - For advanced mathematical and statistical analysis
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Re - For string regex
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;google.cloud - For querying BigQuery data
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;google.oauth2 - For setting up BigQuery credentials
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fuzzywuzzy - For fuzzy matching
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlite3 - To store final data sets in SQL 
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;matplotlib - For creating graphs
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;seaborn - For creating graphs
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ipywidgets - For interactive graphs
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;os - For file handling
 
 
 NOTE: REQUIRES GOOGLE BIGQUERY API KEY JSON FILE IN ORDER TO RUN
