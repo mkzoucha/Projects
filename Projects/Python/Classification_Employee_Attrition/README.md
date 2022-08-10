@@ -1,6 +1,4 @@
-Employee Attrition Classification
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By Michael Zoucha
+Employee Attrition Classification By Michael Zoucha
 
 
 Description: 
