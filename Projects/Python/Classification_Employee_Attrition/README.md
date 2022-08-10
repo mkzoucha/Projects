@@ -1,20 +1,27 @@
 Employee Attrition Classification
-By Michael Zoucha
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By Michael Zoucha
 
 
-Description: EDA and modeling for employee attrition classification
+Description: 
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDA and modeling for employee attrition classification
 
 
 File Dependencies:
 
-ibm_general_data.csv
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ibm_general_data.csv
 
 
 Required Packages:
 
-pandas - For data frame processing of location list
-sklearn - for model building
-matplotlib - visualization
-seaborn - visualization
-imblearn - handling imbalanced classes
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pandas - For data frame processing of location list
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sklearn - for model building
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;matplotlib - visualization
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;seaborn - visualization
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;imblearn - handling imbalanced classes
 
