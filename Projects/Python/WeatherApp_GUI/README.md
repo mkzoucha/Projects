@@ -10,12 +10,17 @@ File Dependencies: NONE
 
 Required Packages
 
-requests - For retrieving weather information from web API
-datetime - For formatting dates and times
-tkinter - For GUI
-PIL - For image support in Tkinter
-io - For string writing to tkinter message widget
-Pandas - For data frame processing of location list
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;requests - For retrieving weather information from web API
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;datetime - For formatting dates and times
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tkinter - For GUI
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PIL - For image support in Tkinter
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;io - For string writing to tkinter message widget
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pandas - For data frame processing of location list
 
 
 NOTE: REQUIRES OPENWEATHERAPI KEY IN ORDER TO RUN
