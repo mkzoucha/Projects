@@ -10,7 +10,7 @@ This is a collection of projects from my data science Master's program from Bell
 ### Projects:
 
 #### R - 
-  [Sales Forecasting (R)]([https://github.com/mkzoucha/Projects/tree/main/Projects/R/SalesForecasting]) using MS SQL AdventureWorks dataset
+  [Sales Forecasting (R)](https://github.com/mkzoucha/Projects/tree/main/Projects/R/SalesForecasting) using MS SQL AdventureWorks dataset
   
 
 #### Python -
