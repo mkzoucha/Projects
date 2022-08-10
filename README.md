@@ -14,15 +14,15 @@ This is a collection of projects from my data science Master's program from Bell
   
 
 #### Python -
-  Employee Attrition Classification
+  [Employee Attrition Classification](https://github.com/mkzoucha/Projects/tree/main/Projects/Python/Classification_Employee_Attrition)
   
-  Hotel Review Classificaiton
+  [Hotel Review Classificaiton](https://github.com/mkzoucha/Projects/tree/main/Projects/Python/Classification_Hotel_Reviews)
   
-  Data Preparation - World population statistics
+  [Data Preparation - World population statistics](https://github.com/mkzoucha/Projects/tree/main/Projects/Python/DataPrep_GDP_Pop_Crime)
   
-  Sales Forecasting using MS SQL AdventureWorks dataset
+  [Sales Forecasting (Python)](https://github.com/mkzoucha/Projects/tree/main/Projects/Python/Forecasting_Bike_Sales) using MS SQL AdventureWorks dataset
   
-  GUI-based weather forecasting application
+  [GUI-based weather forecasting application](https://github.com/mkzoucha/Projects/tree/main/Projects/Python/WeatherApp_GUI)
   
   
 --------------------------------------------------------
